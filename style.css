@@ -51,10 +51,10 @@ nav a:hover { opacity: 1; color: var(--accent); }
 
 .parallax-wrap img {
   position: absolute;
-  top: 50%;
+  top: 75%;
   left: 50%;
-  width: 120%;
-  height: 120%;
+  width: 110%;
+  height: 110%;
   object-fit: cover;
   transform: translate(-50%, -50%);
   will-change: transform;

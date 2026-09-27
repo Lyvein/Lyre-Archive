@@ -86,7 +86,7 @@ nav a:hover { opacity: 1; color: var(--accent); }
   width: 110%;
   height: 110%;
   object-fit: cover;
-  object-position: 50% 70%; /* shift focus down toward the lower part of the image */
+  object-position: 50% 20%; /* shift focus down toward the lower part of the image */
   transform: translate(-50%, -50%);
   will-change: transform;
   transition: transform 0.15s ease-out;

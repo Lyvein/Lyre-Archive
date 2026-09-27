@@ -1,0 +1,117 @@
+:root {
+  --bg: #0f0f14;
+  --fg: #f4f2ee;
+  --accent: #e8b7d4;
+  --muted: #9a97a3;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+nav {
+  display: flex;
+  gap: 2rem;
+  padding: 1.5rem 3rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+nav a {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+nav a:hover { opacity: 1; color: var(--accent); }
+
+/* ---- Hero / index page ---- */
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-wrap {
+  width: min(70vw, 600px);
+  perspective: 800px;
+}
+
+.parallax-wrap img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+.hero-title {
+  position: absolute;
+  bottom: 3rem;
+  text-align: center;
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+/* ---- Intro page ---- */
+.intro {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 8rem 2rem 4rem;
+}
+
+.intro h1 {
+  font-size: 2.5rem;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.intro .subtitle {
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.intro img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 12px;
+  float: right;
+  margin: 0 0 1rem 2rem;
+}
+
+.intro p {
+  line-height: 1.7;
+}
+
+.intro dl {
+  margin-top: 2rem;
+}
+
+.intro dt {
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.intro dd {
+  margin: 0;
+  color: var(--fg);
+}

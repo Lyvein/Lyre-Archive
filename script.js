@@ -1,5 +1,10 @@
 const img = document.querySelector('.parallax-wrap img');
 
+window.addEventListener('load', () => {
+  const loader = document.getElementById('loader');
+  if (loader) loader.classList.add('hidden');
+});
+
 // How far the image can shift, in percentage points.
 // The image is 120% of viewport size, so it has 20% total slack (10% each side)
 // before you'd see an edge. Keep this comfortably under that.

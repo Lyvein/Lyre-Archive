@@ -142,3 +142,8 @@ nav a:hover { opacity: 1; color: var(--accent); }
   margin: 0;
   color: var(--fg);
 }
+
+.loader-gif {
+  width: min(50vw, 400px);  /* 50% of screen width, capped at 400px */
+  height: auto;
+}

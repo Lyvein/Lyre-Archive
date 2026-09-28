@@ -6,9 +6,9 @@ window.addEventListener('load', () => {
 });
 
 // How far the image can shift, in percentage points.
-// The image is 120% of viewport size, so it has 20% total slack (10% each side)
-// before you'd see an edge. Keep this comfortably under that.
-const MAX_SHIFT = 6; // percent
+// The image is 110% of viewport size, so it has 10% total slack (5% each side)
+// before you'd see an edge. Keep this at or under about 5.
+const MAX_SHIFT = 4; // percent
 
 if (img) {
   document.addEventListener('mousemove', (e) => {

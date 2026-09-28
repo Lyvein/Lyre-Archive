@@ -39,7 +39,7 @@ nav a:hover { opacity: 1; color: var(--accent); }
 .loader {
   position: fixed;
   inset: 0;
-  background: var(--bg);
+  background: rgba(0, 0, 0, 0.75); /* transparent black: lower the last number for more see-through */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,17 +53,9 @@ nav a:hover { opacity: 1; color: var(--accent); }
   pointer-events: none;
 }
 
-.loader-spinner {
-  width: 44px;
-  height: 44px;
-  border: 3px solid rgba(244,242,238,0.15);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.loader-gif {
+  width: 120px;   /* adjust to fit your gif */
+  height: auto;
 }
 
 /* ---- Hero / index page ---- */
@@ -86,7 +78,7 @@ nav a:hover { opacity: 1; color: var(--accent); }
   width: 110%;
   height: 110%;
   object-fit: cover;
-  object-position: 50% 20%; /* shift focus down toward the lower part of the image */
+  object-position: 50% 70%; /* shift focus down toward the lower part of the image */
   transform: translate(-50%, -50%);
   will-change: transform;
   transition: transform 0.15s ease-out;

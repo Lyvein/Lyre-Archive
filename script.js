@@ -1,6 +1,6 @@
 const img = document.querySelector('.parallax-wrap img');
 
-const MIN_LOADER_TIME = 1000; // milliseconds
+const MIN_LOADER_TIME = 1500; // milliseconds
 const startTime = Date.now();
 
 window.addEventListener('load', () => {
@@ -18,8 +18,8 @@ const MAX_SHIFT = 4; // percent
 
 if (img) {
   document.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 2;  // -1 to 1
-    const y = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
+    const x = (e.clientX / window.innerWidth - 0.25) * 2;  // -1 to 1
+    const y = (e.clientY / window.innerHeight - 0.25) * 2; // -1 to 1
 
     // Move opposite to cursor for a subtle "looking around" 3D feel
     const shiftX = -x * MAX_SHIFT;

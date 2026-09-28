@@ -1,6 +1,6 @@
 const img = document.querySelector('.parallax-wrap img');
 
-const MIN_LOADER_TIME = 3000; // milliseconds
+const MIN_LOADER_TIME = 1500; // milliseconds
 const startTime = Date.now();
 
 window.addEventListener('load', () => {

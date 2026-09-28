@@ -1,8 +1,14 @@
 const img = document.querySelector('.parallax-wrap img');
 
+const MIN_LOADER_TIME = 3000; // milliseconds
+const startTime = Date.now();
+
 window.addEventListener('load', () => {
   const loader = document.getElementById('loader');
-  if (loader) loader.classList.add('hidden');
+  const remaining = Math.max(0, MIN_LOADER_TIME - (Date.now() - startTime));
+  setTimeout(() => {
+    if (loader) loader.classList.add('hidden');
+  }, remaining);
 });
 
 // How far the image can shift, in percentage points.

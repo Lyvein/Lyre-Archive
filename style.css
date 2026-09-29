@@ -1,7 +1,8 @@
 :root {
   --bg: #0f0f14;
   --fg: #f4f2ee;
-  --accent: #96B59C;
+  --intro_accent: #96B59C;
+  --menu_accent: #CFFFC4;
   --muted: #9a97a3;
 }
 
@@ -36,19 +37,22 @@ nav a {
   transition: opacity 0.2s;
 }
 
-nav a:hover { opacity: 1; color: var(--accent); }
+nav a:hover { opacity: 1; color: var(--menu_accent); }
 
 .loader {
   position: fixed;
   inset: 0;
-  height: 100vh;   /* fallback for older browsers */
-  height: 100dvh;  /* stays accurate on mobile as the address bar shows/hides */
+  height: 100vh;
+  height: 100dvh;
   width: 100vw;
-  background: rgba(0, 0, 0, 0.75); /* transparent black: lower the last number for more see-through */
+
+  background: #000; /* solid black while GIF is playing */
+
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 1000;
+
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 
@@ -59,7 +63,7 @@ nav a:hover { opacity: 1; color: var(--accent); }
 }
 
 .loader-gif {
-  width: min(40vw, 300px);  /* scales with screen, capped at 300px */
+  width: min(40vw, 400px);  /* scales with screen, capped at 400px */
   height: auto;
   display: block;
 }
@@ -84,8 +88,8 @@ nav a:hover { opacity: 1; color: var(--accent); }
 .click-fx.trail {
   width: 5px;
   height: 5px;
-  background: var(--accent);
-  box-shadow: 0 0 6px 2px var(--accent);
+  background: #ffffff;
+  box-shadow: 0 0 6px 2px rgba(255,255,255,0.8);
   animation: trail-fade 0.5s ease-out forwards;
 }
 
@@ -130,6 +134,36 @@ nav a:hover { opacity: 1; color: var(--accent); }
   10%  { opacity: 0.9; }
   90%  { opacity: 0.4; }
   100% { opacity: 0; transform: translateY(-120px) scale(1.1); }
+}
+
+/* ---- Diagonal page transition panel ---- */
+.transition-panel {
+  position: fixed;
+  top: -100%;
+  left: -100%;
+  width: 250%;
+  height: 250%;
+
+  /* translucent while entering/leaving */
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  transform: rotate(-15deg) translate(100%, 100%);
+
+  transition:
+    transform 1.4s cubic-bezier(0.83, 0, 0.17, 1),
+    background-color 1.4s cubic-bezier(0.83, 0, 0.17, 1);
+
+  z-index: 999;
+  pointer-events: none;
+}
+
+.transition-panel.covering {
+  transform: rotate(-15deg) translate(0%, 0%);
+
+  /* becomes nearly solid as it finishes covering */
+  background: rgba(0, 0, 0, 1);
 }
 
 /* ---- Hero / index page ---- */
@@ -183,7 +217,7 @@ nav a:hover { opacity: 1; color: var(--accent); }
 
 .intro h1 {
   font-size: 2.5rem;
-  color: var(--accent);
+  color: var(--intro_accent);
   margin-bottom: 0.25rem;
 }
 
@@ -209,7 +243,7 @@ nav a:hover { opacity: 1; color: var(--accent); }
 }
 
 .intro dt {
-  color: var(--accent);
+  color: var(--intro_accent);
   font-weight: 600;
   margin-top: 1rem;
 }
@@ -217,4 +251,352 @@ nav a:hover { opacity: 1; color: var(--accent); }
 .intro dd {
   margin: 0;
   color: var(--fg);
+}
+
+
+/* =========================================================
+   LYVEIN — NODAL HUB
+   ========================================================= */
+
+.nodal_hub-page {
+	margin: 0;
+	min-height: 100vh;
+	overflow: hidden;
+	background: #dceaf2;
+
+	/* Change this one value to recolor the Lyvein nodes + labels. */
+	--node-color: #C7EDF7;
+	--node-label-color: #8FD5ED;
+}
+
+
+/* ---------- Full-screen Key Visual ---------- */
+
+.lyvein-hub {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.lyvein-kv {
+	position: absolute;
+	inset: 0;
+
+	background-image: url("images/blue_horizontal.png");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+
+/* Very subtle atmosphere over the KV.
+   Remove this ::after block if you prefer the original image untouched. */
+
+.lyvein-kv::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+
+	background: rgba(255, 255, 255, 0.045);
+}
+
+/* =========================================================
+   NODE — BASE
+   ========================================================= */
+
+.lyvein-node {
+	position: absolute;
+	z-index: 2;
+
+	display: flex;
+	align-items: center;
+	gap: 9px;
+
+	text-decoration: none;
+
+	/* Gives each node a generous invisible hover area */
+	padding: 14px;
+
+	transform: translate(-50%, -50%);
+
+	cursor: pointer;
+}
+
+
+/* ---------- Tiny index ---------- */
+
+.node-number {
+	position: absolute;
+	left: clamp(6px, 0.3vw, 11px);
+	top: clamp(-19px, -0.9vw, -11px);
+	font-family: "Saira Extra Condensed", sans-serif;
+	font-size: clamp(16px, 0.78vw, 25px);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	color: var(--node-color);
+	text-shadow:
+		0 0 8px color-mix(in srgb, var(--node-color) 40%, transparent);
+	transition:
+		color 0.35s ease,
+		opacity 0.35s ease;
+}
+
+
+/* =========================================================
+   LYVEIN NODES
+   ========================================================= */
+
+.node-dot {
+	position: relative;
+	width: clamp(20px, 1.1vw, 36px);
+	height: clamp(20px, 1.1vw, 36px);
+	border-radius: 50%;
+	background: var(--node-color);
+	border: none;
+	box-shadow:
+		0 0 clamp(6px, 0.35vw, 12px)
+			color-mix(in srgb, var(--node-color) 75%, transparent),
+		0 0 clamp(12px, 0.7vw, 24px)
+			color-mix(in srgb, var(--node-color) 30%, transparent);
+	transition:
+		transform 0.35s cubic-bezier(.2,.8,.2,1),
+		background 0.35s ease,
+		box-shadow 0.35s ease;
+}
+
+
+.node-dot::before {
+	display: none;
+}
+
+
+.node-dot::after {
+	content: "";
+
+	position: absolute;
+	inset: 0;
+
+	border-radius: 50%;
+
+	/* darker core fading outward into the pale node color */
+	background:
+		radial-gradient(
+			circle at center,
+			color-mix(in srgb, var(--node-color) 68%, #5EAED0) 0%,
+			color-mix(in srgb, var(--node-color) 82%, #79BDD8) 34%,
+			color-mix(in srgb, var(--node-color) 94%, white) 72%,
+			color-mix(in srgb, var(--node-color) 82%, white) 100%
+		);
+
+	transition:
+		opacity 0.35s ease,
+		transform 0.35s ease;
+}
+
+
+/* =========================================================
+   NODE LABEL
+   ========================================================= */
+
+.node-label {
+	position: absolute;
+	left: calc(100% + clamp(15px, 0.8vw, 28px));
+	top: 50%;
+	transform: translate(-7px, -50%);
+	white-space: nowrap;
+	font-family: "Federo", sans-serif;
+	font-size: clamp(19px, 1vw, 32px);
+	font-weight: 400;
+	letter-spacing: 0.045em;
+	color: var(--node-label-color);
+	text-shadow:
+		0 0 10px color-mix(in srgb, var(--node-label-color) 32%, transparent);
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		opacity 0.3s ease,
+		transform 0.4s cubic-bezier(.2,.8,.2,1);
+}
+
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.lyvein-node:hover .node-dot,
+.lyvein-node:focus-visible .node-dot {
+	transform: scale(1.15);
+	background: var(--node-color);
+	box-shadow:
+		0 0 clamp(8px, 0.45vw, 15px)
+			color-mix(in srgb, var(--node-color) 95%, transparent),
+		0 0 clamp(16px, 0.9vw, 30px)
+			color-mix(in srgb, var(--node-color) 45%, transparent);
+}
+
+
+.lyvein-node:hover .node-dot::after,
+.lyvein-node:focus-visible .node-dot::after {
+	opacity: 0.7;
+	transform: scale(1.15);
+}
+
+
+.lyvein-node:hover .node-label,
+.lyvein-node:focus-visible .node-label {
+	opacity: 1;
+	transform: translate(0, -50%);
+}
+
+
+.lyvein-node:hover .node-number,
+.lyvein-node:focus-visible .node-number {
+	color: var(--node-color);
+}
+
+
+/* =========================================================
+   NODE POSITIONS
+
+   These are intentionally asymmetric.
+   Move them freely once you see them against your KV.
+   ========================================================= */
+
+.node-modern {
+	left: 19%;
+	top: 31%;
+}
+
+.node-fantasy {
+	left: 77%;
+	top: 24%;
+}
+
+.node-northern {
+	left: 34%;
+	top: 48%;
+}
+
+.node-unknown {
+	left: 27%;
+	top: 76%;
+}
+
+.node-ellipsis {
+	left: 87%;
+	top: 49%;
+}
+
+.node-magic {
+	left: 66%;
+	top: 59%;
+}
+
+
+/* =========================================================
+   MOBILE NODE POSITION	
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+	.lyvein-kv {
+		/*
+		   Horizontal artwork will inevitably crop on portrait screens.
+		   Adjust this once you've checked the composition.
+		*/
+		background-position: center;
+	}
+
+	.node-label {
+		font-size: 15px;
+	}
+
+	.node-modern {
+		left: 17%;
+		top: 28%;
+	}
+
+	.node-fantasy {
+		left: 70%;
+		top: 22%;
+	}
+
+	.node-northern {
+		left: 68%;
+		top: 67%;
+	}
+
+	.node-unknown {
+		left: 22%;
+		top: 74%;
+	}
+
+	.node-ellipsis {
+		left: 82%;
+		top: 45%;
+	}
+
+	.node-magic {
+	left: 66%;
+	top: 59%;
+	}
+
+}
+
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+
+	.node-dot,
+	.node-dot::before,
+	.node-label,
+	.node-number {
+		transition: none;
+	}
+}
+
+/* =========================================================
+   OC PAGE — NAVBAR OVERRIDE
+   These colors only apply to oc.html.
+   Home keeps its original navbar styling.
+   ========================================================= */
+
+.nodal_hub-page nav a {
+	color: #B7DEED;
+}
+
+.nodal_hub-page nav a:hover,
+.nodal_hub-page nav a:focus-visible {
+	color: #0077A8;
+}
+
+
+/* =========================================================
+   NODE NETWORK
+   ========================================================= */
+
+.node-network {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+
+	z-index: 1;
+	pointer-events: none;
+	overflow: visible;
+}
+
+.node-network line {
+	vector-effect: non-scaling-stroke;
+
+	stroke: rgba(143, 213, 237, 0.32);
+	stroke-width: 1;
+
+	filter: drop-shadow(
+		0 0 3px rgba(199, 237, 247, 0.35)
+	);
 }

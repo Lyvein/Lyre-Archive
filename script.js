@@ -1,15 +1,88 @@
 const img = document.querySelector('.parallax-wrap img');
 
-const MIN_LOADER_TIME = 1500; // milliseconds
+// ---- Diagonal page transition (set up first, so it's ready before load logic runs) ----
+// Sequence: click -> diagonal slide-out covers the page -> navigate ->
+// new page arrives already covered -> loading spinner runs on top of
+// the solid panel -> once ready, loading fades away -> THEN the panel
+// slides diagonally away, revealing the page.
+const panel = document.getElementById('transition-panel');
+const TRANSITION_DURATION = 1400; // must match the CSS transform transition duration
+const arrivingFromTransition = panel && sessionStorage.getItem('siteTransitioning') === '1';
+
+if (panel && arrivingFromTransition) {
+  sessionStorage.removeItem('siteTransitioning');
+  // Snap to fully covered instantly (no slide animation) so there's no
+  // flash of the page before resources are ready. Disable the transition
+  // just for this one frame, then re-enable it for the later reveal slide.
+  panel.style.transition = 'none';
+  panel.classList.add('covering');
+  requestAnimationFrame(() => {
+    panel.style.transition = '';
+  });
+}
+
+function revealPanel() {
+  // Removing 'covering' slides the panel diagonally off-screen again,
+  // this time revealing the page underneath.
+  if (panel) panel.classList.remove('covering');
+}
+
+if (panel) {
+  document.querySelectorAll('nav a').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('http') || href.startsWith('#')) return;
+
+      e.preventDefault();
+      sessionStorage.setItem('siteTransitioning', '1');
+      panel.classList.add('covering'); // diagonal slide-out
+      setTimeout(() => {
+        window.location.href = href;
+      }, TRANSITION_DURATION);
+    });
+  });
+}
+
+// ---- Loading screen: waits for the page's actual resources ----
+// window's 'load' event only fires once everything (images, and video
+// METADATA) has finished loading. If you swap the hero image for an
+// <video id="hero-video"> element, give it that id and this will also
+// wait for the video's data to be ready before hiding the loader —
+// not just its metadata — so a heavier MP4 keeps the loader up longer
+// automatically, with no other changes needed.
+const MIN_LOADER_TIME = 1500; // milliseconds — floor so it never flashes too fast
 const startTime = Date.now();
 
-window.addEventListener('load', () => {
+function hideLoaderWhenReady() {
   const loader = document.getElementById('loader');
-  const remaining = Math.max(0, MIN_LOADER_TIME - (Date.now() - startTime));
-  setTimeout(() => {
-    if (loader) loader.classList.add('hidden');
-  }, remaining);
-});
+  const heroVideo = document.getElementById('hero-video');
+
+  const pageLoaded = new Promise((resolve) => {
+    if (document.readyState === 'complete') resolve();
+    else window.addEventListener('load', resolve);
+  });
+
+  const videoReady = heroVideo
+    ? new Promise((resolve) => {
+        if (heroVideo.readyState >= 3) resolve(); // HAVE_FUTURE_DATA or better
+        else heroVideo.addEventListener('canplaythrough', resolve, { once: true });
+      })
+    : Promise.resolve();
+
+  Promise.all([pageLoaded, videoReady]).then(() => {
+    const remaining = Math.max(0, MIN_LOADER_TIME - (Date.now() - startTime));
+    setTimeout(() => {
+      if (loader) loader.classList.add('hidden');
+      // Start the panel's reveal slide at the same moment the loader
+      // begins fading, so the two overlap instead of leaving a static
+      // pause between "spinner gone" and "slide starts."
+      revealPanel();
+    }, remaining);
+  });
+}
+
+hideLoaderWhenReady();
+
 
 // How far the image can shift, in percentage points.
 // The image is 110% of viewport size, so it has 10% total slack (5% each side)

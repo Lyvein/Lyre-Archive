@@ -18,8 +18,8 @@ const MAX_SHIFT = 4; // percent
 
 if (img) {
   document.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.25) * 2;  // -1 to 1
-    const y = (e.clientY / window.innerHeight - 0.25) * 2; // -1 to 1
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;  // -1 to 1
+    const y = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
 
     // Move opposite to cursor for a subtle "looking around" 3D feel
     const shiftX = -x * MAX_SHIFT;
@@ -37,3 +37,46 @@ if (img) {
     img.style.transition = 'transform 0.15s ease-out';
   });
 }
+
+// ---- Click / drag VFX ----
+function spawnFx(x, y, type) {
+  const el = document.createElement('div');
+  el.className = `click-fx ${type}`;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+let lastTrailTime = 0;
+const TRAIL_INTERVAL = 40; // ms between trail dots as the mouse moves
+
+document.addEventListener('mousedown', (e) => {
+  spawnFx(e.clientX, e.clientY, 'ripple');
+});
+
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if (now - lastTrailTime > TRAIL_INTERVAL) {
+    spawnFx(e.clientX, e.clientY, 'trail');
+    lastTrailTime = now;
+  }
+});
+
+// ---- Ambient glowing sparks ----
+function initSparks(containerId, count = 25) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  for (let i = 0; i < count; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'spark';
+    spark.style.left = `${Math.random() * 100}%`;
+    spark.style.top = `${Math.random() * 100}%`;
+    spark.style.animationDuration = `${4 + Math.random() * 6}s`; // 4-10s
+    spark.style.animationDelay = `${Math.random() * 8}s`;
+    container.appendChild(spark);
+  }
+}
+
+initSparks('sparks');

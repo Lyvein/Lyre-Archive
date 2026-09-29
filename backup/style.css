@@ -873,7 +873,7 @@ html.is-arriving
 
 
 @keyframes out-home-visual {
-  0% {
+  0%, 50% {
     background-color: rgba(0, 0, 0, 1);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
@@ -904,7 +904,7 @@ html.is-arriving
 
 
 @keyframes out-hub-visual {
-  0% {
+  0%, 50% {
     background-color: rgba(235, 246, 250, 1);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);

@@ -51,7 +51,10 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1002;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
@@ -134,36 +137,6 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
   10%  { opacity: 0.9; }
   90%  { opacity: 0.4; }
   100% { opacity: 0; transform: translateY(-120px) scale(1.1); }
-}
-
-/* ---- Diagonal page transition panel ---- */
-.transition-panel {
-  position: fixed;
-  top: -100%;
-  left: -100%;
-  width: 250%;
-  height: 250%;
-
-  /* translucent while entering/leaving */
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-
-  transform: rotate(-15deg) translate(100%, 100%);
-
-  transition:
-    transform 1.4s cubic-bezier(0.83, 0, 0.17, 1),
-    background-color 1.4s cubic-bezier(0.83, 0, 0.17, 1);
-
-  z-index: 999;
-  pointer-events: none;
-}
-
-.transition-panel.covering {
-  transform: rotate(-15deg) translate(0%, 0%);
-
-  /* becomes nearly solid as it finishes covering */
-  background: rgba(0, 0, 0, 1);
 }
 
 /* ---- Hero / index page ---- */
@@ -264,357 +237,282 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
 
 
 /* =========================================================
-   LYVEIN — NODAL HUB
+   NODAL HUB — SCENE AND CAMERA
    ========================================================= */
 
 .nodal_hub-page {
-	margin: 0;
-	min-height: 100vh;
-	overflow: hidden;
-	background: #dceaf2;
-
-	/* Change this one value to recolor the Lyvein nodes + labels. */
-	--node-color: #C7EDF7;
-	--node-label-color: #8FD5ED;
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #dceaf2;
+  --node-color: #C7EDF7;
+  --node-label-color: #87E4FA;
 }
 
-
-/* ---------- Full-screen Key Visual ---------- */
-
 .lyvein-hub {
-	position: relative;
-	width: 100vw;
-	height: 100vh;
-	overflow: hidden;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .lyvein-kv {
-	position: absolute;
-	inset: 0;
-
-	background-image: url("images/blue_horizontal.png");
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  background-image: url("images/1blue_horizontal.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-
-/* Very subtle atmosphere over the KV.
-   Remove this ::after block if you prefer the original image untouched. */
-
 .lyvein-kv::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.045);
+}
 
-	background: rgba(255, 255, 255, 0.045);
+.node-camera-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform-origin: center;
+  transition: transform 0.9s cubic-bezier(.25, .1, .25, 1);
+}
+
+.node-zoom-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  transform-origin: 0 0;
+  transition: transform 0.8s cubic-bezier(.25, .1, .25, 1);
 }
 
 /* =========================================================
-   NODE — BASE
+   NODES — POSITIONED BY JAVASCRIPT
    ========================================================= */
 
 .lyvein-node {
-	position: absolute;
-	z-index: 2;
-
-	display: flex;
-	align-items: center;
-	gap: 9px;
-
-	text-decoration: none;
-
-	/* Gives each node a generous invisible hover area */
-	padding: 14px;
-
-	transform: translate(-50%, -50%);
-
-	cursor: pointer;
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px;
+  text-decoration: none;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.35s ease, filter 0.45s ease;
 }
-
-
-/* ---------- Tiny index ---------- */
 
 .node-number {
-	position: absolute;
-	left: clamp(6px, 0.3vw, 11px);
-	top: clamp(-19px, -0.9vw, -11px);
-	font-family: "Saira Extra Condensed", sans-serif;
-	font-size: clamp(16px, 0.78vw, 25px);
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	color: var(--node-color);
-	text-shadow:
-		0 0 8px color-mix(in srgb, var(--node-color) 40%, transparent);
-	transition:
-		color 0.35s ease,
-		opacity 0.35s ease;
+  position: absolute;
+  left: clamp(6px, 0.3vw, 11px);
+  top: clamp(-19px, -0.9vw, -11px);
+  font-family: "Saira Extra Condensed", sans-serif;
+  font-size: clamp(16px, 0.78vw, 25px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--node-label-color);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--node-label-color) 40%, transparent);
+  transition: color 0.35s ease, opacity 0.35s ease;
 }
-
-
-/* =========================================================
-   LYVEIN NODES
-   ========================================================= */
 
 .node-dot {
-	position: relative;
-	width: clamp(20px, 1.1vw, 36px);
-	height: clamp(20px, 1.1vw, 36px);
-	border-radius: 50%;
-	background: var(--node-color);
-	border: none;
-	box-shadow:
-		0 0 clamp(6px, 0.35vw, 12px)
-			color-mix(in srgb, var(--node-color) 75%, transparent),
-		0 0 clamp(12px, 0.7vw, 24px)
-			color-mix(in srgb, var(--node-color) 30%, transparent);
-	transition:
-		transform 0.35s cubic-bezier(.2,.8,.2,1),
-		background 0.35s ease,
-		box-shadow 0.35s ease;
+  position: relative;
+  width: clamp(20px, 1.1vw, 36px);
+  height: clamp(20px, 1.1vw, 36px);
+  border-radius: 50%;
+  background: var(--node-color);
+  border: none;
+  box-shadow:
+    0 0 clamp(6px, 0.35vw, 12px) color-mix(in srgb, var(--node-color) 75%, transparent),
+    0 0 clamp(12px, 0.7vw, 24px) color-mix(in srgb, var(--node-color) 30%, transparent);
+  transition:
+    transform 0.35s cubic-bezier(.2, .8, .2, 1),
+    background 0.35s ease,
+    box-shadow 0.35s ease;
 }
-
 
 .node-dot::before {
-	display: none;
+  display: none;
 }
-
 
 .node-dot::after {
-	content: "";
-
-	position: absolute;
-	inset: 0;
-
-	border-radius: 50%;
-
-	/* darker core fading outward into the pale node color */
-	background:
-		radial-gradient(
-			circle at center,
-			color-mix(in srgb, var(--node-color) 68%, #5EAED0) 0%,
-			color-mix(in srgb, var(--node-color) 82%, #79BDD8) 34%,
-			color-mix(in srgb, var(--node-color) 94%, white) 72%,
-			color-mix(in srgb, var(--node-color) 82%, white) 100%
-		);
-
-	transition:
-		opacity 0.35s ease,
-		transform 0.35s ease;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--node-color) 68%, #5EAED0) 0%,
+    color-mix(in srgb, var(--node-color) 82%, #79BDD8) 34%,
+    color-mix(in srgb, var(--node-color) 94%, white) 72%,
+    color-mix(in srgb, var(--node-color) 82%, white) 100%
+  );
+  transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-
-/* =========================================================
-   NODE LABEL
-   ========================================================= */
-
-.node-label {
-	position: absolute;
-	left: calc(100% + clamp(15px, 0.8vw, 28px));
-	top: 50%;
-	transform: translate(-7px, -50%);
-	white-space: nowrap;
-	font-family: "Federo", sans-serif;
-	font-size: clamp(19px, 1vw, 32px);
-	font-weight: 400;
-	letter-spacing: 0.045em;
-	color: var(--node-label-color);
-	text-shadow:
-		0 0 10px color-mix(in srgb, var(--node-label-color) 32%, transparent);
-	opacity: 0;
-	pointer-events: none;
-	transition:
-		opacity 0.3s ease,
-		transform 0.4s cubic-bezier(.2,.8,.2,1);
-}
-
-
-
-/* =========================================================
-   HOVER
-   ========================================================= */
-
+/* Keep the dot's hover glow; hovering does not reveal text. */
 .lyvein-node:hover .node-dot,
 .lyvein-node:focus-visible .node-dot {
-	transform: scale(1.15);
-	background: var(--node-color);
-	box-shadow:
-		0 0 clamp(8px, 0.45vw, 15px)
-			color-mix(in srgb, var(--node-color) 95%, transparent),
-		0 0 clamp(16px, 0.9vw, 30px)
-			color-mix(in srgb, var(--node-color) 45%, transparent);
+  transform: scale(1.15);
+  box-shadow:
+    0 0 clamp(8px, 0.45vw, 15px) color-mix(in srgb, var(--node-color) 95%, transparent),
+    0 0 clamp(16px, 0.9vw, 30px) color-mix(in srgb, var(--node-color) 45%, transparent);
 }
-
 
 .lyvein-node:hover .node-dot::after,
 .lyvein-node:focus-visible .node-dot::after {
-	opacity: 0.7;
-	transform: scale(1.15);
+  opacity: 0.7;
+  transform: scale(1.15);
 }
-
-
-.lyvein-node:hover .node-label,
-.lyvein-node:focus-visible .node-label {
-	opacity: 1;
-	transform: translate(0, -50%);
-}
-
 
 .lyvein-node:hover .node-number,
 .lyvein-node:focus-visible .node-number {
-	color: var(--node-color);
+  color: var(--node-color);
 }
-
 
 /* =========================================================
-   NODE POSITIONS
-
-   These are intentionally asymmetric.
-   Move them freely once you see them against your KV.
+   LABELS — REVEALED ONLY AFTER CAMERA MOVEMENT
    ========================================================= */
 
-.node-modern {
-	left: 19%;
-	top: 31%;
+.node-label {
+  position: absolute;
+  left: calc(100% + clamp(15px, 0.8vw, 28px));
+  top: 50%;
+  width: max-content;
+  white-space: nowrap;
+  overflow-wrap: anywhere;
+  font-family: "Federo", sans-serif;
+  font-size: clamp(19px, 1vw, 32px);
+  font-weight: 400;
+  letter-spacing: 0.045em;
+  color: var(--node-label-color);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--node-label-color) 32%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(var(--label-slide-from, -12px), var(--label-offset-y, -50%));
+  transition: opacity 0.55s ease, transform 0.7s ease;
 }
 
-.node-fantasy {
-	left: 77%;
-	top: 24%;
+.lyvein-kv.is-node-focused .is-camera-target.is-label-visible .node-label {
+  opacity: 1;
+  transform: translate(0, var(--label-offset-y, -50%));
 }
-
-.node-northern {
-	left: 34%;
-	top: 48%;
-}
-
-.node-unknown {
-	left: 27%;
-	top: 76%;
-}
-
-.node-ellipsis {
-	left: 87%;
-	top: 49%;
-}
-
-.node-magic {
-	left: 66%;
-	top: 59%;
-}
-
-
-/* =========================================================
-   MOBILE NODE POSITION	
-   ========================================================= */
 
 @media (max-width: 768px) {
-
-	.lyvein-kv {
-		/*
-		   Horizontal artwork will inevitably crop on portrait screens.
-		   Adjust this once you've checked the composition.
-		*/
-		background-position: center;
-	}
-
-	.node-label {
-		font-size: 15px;
-	}
-
-	.node-modern {
-		left: 17%;
-		top: 28%;
-	}
-
-	.node-fantasy {
-		left: 70%;
-		top: 22%;
-	}
-
-	.node-northern {
-		left: 68%;
-		top: 67%;
-	}
-
-	.node-unknown {
-		left: 22%;
-		top: 74%;
-	}
-
-	.node-ellipsis {
-		left: 82%;
-		top: 45%;
-	}
-
-	.node-magic {
-	left: 66%;
-	top: 59%;
-	}
-
-}
-
-
-/* Respect reduced-motion preferences */
-
-@media (prefers-reduced-motion: reduce) {
-
-	.node-dot,
-	.node-dot::before,
-	.node-label,
-	.node-number {
-		transition: none;
-	}
+  .node-label {
+    font-size: 15px;
+  }
 }
 
 /* =========================================================
-   Nodal Hub PAGE — NAVBAR OVERRIDE
-   These colors only apply to nodal_hub.html.
-   Home keeps its original navbar styling.
+   NETWORK AND FOCUSED STATE
+   ========================================================= */
+
+.node-network {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+  transition: opacity 0.5s ease;
+}
+
+.node-network line {
+  vector-effect: non-scaling-stroke;
+  stroke: rgba(143, 213, 237, 0.32);
+  stroke-width: 1;
+  filter: drop-shadow(0 0 3px rgba(199, 237, 247, 0.35));
+}
+
+.lyvein-kv.is-node-focused .lyvein-node {
+  opacity: 0;
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.lyvein-kv.is-node-focused .lyvein-node.is-camera-target {
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+}
+
+.lyvein-kv.is-node-focused .node-network {
+  opacity: 0;
+}
+
+/* =========================================================
+   HUB NAVIGATION AND CAMERA RETURN BUTTON
    ========================================================= */
 
 .nodal_hub-page nav a {
-	color: #B7DEED;
+  color: #B7DEED;
 }
 
 .nodal_hub-page nav a:hover,
 .nodal_hub-page nav a:focus-visible {
-	color: #0077A8;
+  color: #0077A8;
 }
 
+.node-camera-back {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 20;
+  padding: 10px 16px;
+  border: 1px solid rgba(143, 213, 237, 0.65);
+  border-radius: 2px;
+  background: rgba(220, 234, 242, 0.8);
+  color: #497c92;
+  font-family: "Saira Extra Condensed", sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.node-camera-back.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.node-camera-back:hover {
+  background: rgba(240, 250, 255, 0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-camera-background,
+  .node-zoom-layer,
+  .lyvein-node,
+  .node-dot,
+  .node-dot::after,
+  .node-label,
+  .node-number,
+  .node-network,
+  .node-camera-back {
+    transition: none;
+  }
+}
 
 /* =========================================================
-   NODE NETWORK
-   ========================================================= */
-
-.node-network {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-
-	z-index: 1;
-	pointer-events: none;
-	overflow: visible;
-}
-
-.node-network line {
-	vector-effect: non-scaling-stroke;
-
-	stroke: rgba(143, 213, 237, 0.32);
-	stroke-width: 1;
-
-	filter: drop-shadow(
-		0 0 3px rgba(199, 237, 247, 0.35)
-	);
-}
-
-/* =========================================================
-   PAGE TRANSITION
-
-   IN:  blur/translucent -> solid while moving in.
-   OUT: exact visual reverse: solid -> blur/translucent while moving out.
+   PAGE TRANSITIONS — EXISTING TIMING AND THEMES
    ========================================================= */
 
 .transition-panel,
@@ -628,17 +526,12 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
   will-change: transform, background-color, backdrop-filter;
 }
 
-/* ---------------- IN ---------------- */
-
 .transition-panel {
   z-index: 999;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   transform: rotate(-15deg) translate(100%, 100%);
-
-  /*
-     Movement runs for 1.4s.
-     Blur/translucent is kept through roughly the first half,
-     then changes to solid during the second half.
-  */
   transition:
     transform 1.4s cubic-bezier(0.83, 0, 0.17, 1),
     background-color 0.7s ease 0.7s,
@@ -648,17 +541,9 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
 
 .transition-panel.covering {
   transform: rotate(-15deg) translate(0%, 0%);
+  background: rgba(0, 0, 0, 1);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
-}
-
-/* ---------------- LOADING ---------------- */
-
-.loader {
-  z-index: 1002;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
 }
 
 .loader.active {
@@ -680,22 +565,13 @@ html.is-arriving[data-departing-theme="nodal-hub"] .loader {
   background: #ebf6fa;
 }
 
-/* ---------------- OUT ---------------- */
-
 .out-panel {
   z-index: 1001;
+  opacity: 1;
   visibility: hidden;
-
-  /* OUT begins fully covering the page and fully solid. */
   transform: rotate(-15deg) translate(0%, 0%);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
-
-  /*
-     Exact inverse feel of IN:
-     movement starts immediately while solid; around halfway,
-     the visual state starts changing into blur/translucent.
-  */
   transition:
     transform 1.4s cubic-bezier(0.83, 0, 0.17, 1),
     background-color 0.7s ease 0.7s,
@@ -711,11 +587,10 @@ html.is-arriving .out-panel {
   transform: rotate(-15deg) translate(100%, 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  transition: transform 1.4s cubic-bezier(0.83, 0, 0.17, 1);
 }
 
-/* ---------------- THEMES ---------------- */
-
-/* HOME IN: blur/translucent -> solid */
+/* Home theme. */
 .transition-panel[data-transition-theme="home"] {
   background: rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(20px);
@@ -726,9 +601,10 @@ html.is-arriving .out-panel {
   background: rgba(0, 0, 0, 1);
 }
 
-/* HOME OUT: solid -> blur/translucent */
 .out-panel[data-transition-theme="home"] {
   background: rgba(0, 0, 0, 1);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
 }
 
 .out-panel.leaving[data-transition-theme="home"] {
@@ -739,7 +615,7 @@ body[data-page-theme="home"] .loader {
   background: #000000;
 }
 
-/* NODAL HUB IN: blur/translucent -> solid */
+/* Nodal hub theme. */
 .transition-panel[data-transition-theme="nodal-hub"] {
   background: rgba(235, 246, 250, 0.58);
   backdrop-filter: blur(20px);
@@ -750,9 +626,10 @@ body[data-page-theme="home"] .loader {
   background: rgba(235, 246, 250, 1);
 }
 
-/* NODAL HUB OUT: solid -> blur/translucent */
 .out-panel[data-transition-theme="nodal-hub"] {
   background: rgba(235, 246, 250, 1);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
 }
 
 .out-panel.leaving[data-transition-theme="nodal-hub"] {
@@ -763,123 +640,14 @@ body[data-page-theme="nodal-hub"] .loader {
   background: #ebf6fa;
 }
 
-
-/* =========================================================
-   NEW OUT PANEL
-   Reverse of transition IN
-   ========================================================= */
-
-
-/* ---------------------------------------------------------
-   OUT PANEL — BASE
-
-   Starts:
-   fully covering screen
-   solid
-   no blur
-
-   Then .leaving:
-   moves upper-left -> lower-right
-   first half stays solid
-   second half becomes blurred/translucent
-   --------------------------------------------------------- */
-
-.out-panel {
-  position: fixed;
-
-  top: -100%;
-  left: -100%;
-
-  width: 250%;
-  height: 250%;
-
-  z-index: 1001;
-
-  pointer-events: none;
-
-  transform:
-    rotate(-15deg)
-    translate(0%, 0%);
-
-  opacity: 1;
-
-  visibility: hidden;
-
-  will-change:
-    transform,
-    backdrop-filter,
-    background-color;
+/* Preserved OUT visuals; existing JavaScript controls arrival. */
+html.is-arriving .out-panel[data-transition-theme="home"].leaving {
+  animation: out-home-visual 1.4s linear forwards;
 }
 
-
-/* Only show it during page-transition arrival */
-
-html.is-arriving .out-panel {
-  visibility: visible;
+html.is-arriving .out-panel[data-transition-theme="nodal-hub"].leaving {
+  animation: out-hub-visual 1.4s linear forwards;
 }
-
-
-/* =========================================================
-   HOME OUT PANEL
-   ========================================================= */
-
-.out-panel[data-transition-theme="home"] {
-  background-color: rgba(0, 0, 0, 1);
-
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
-}
-
-
-/* =========================================================
-   NODAL HUB OUT PANEL
-   ========================================================= */
-
-.out-panel[data-transition-theme="nodal-hub"] {
-  background-color: rgba(235, 246, 250, 1);
-
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
-}
-
-
-/* =========================================================
-   OUT MOVEMENT
-
-   This is the reverse geometry of IN.
-   ========================================================= */
-
-.out-panel.leaving {
-  transform:
-    rotate(-15deg)
-    translate(100%, 100%);
-
-  transition:
-    transform 1.4s cubic-bezier(0.83, 0, 0.17, 1);
-}
-
-
-/* =========================================================
-   HOME OUT VISUAL
-   solid -> blur/translucent
-
-   0–50%:
-   stays solid
-
-   50–100%:
-   gradually becomes blurred/translucent
-   ========================================================= */
-
-html.is-arriving
-.out-panel[data-transition-theme="home"].leaving {
-
-  animation:
-    out-home-visual
-    1.4s
-    linear
-    forwards;
-}
-
 
 @keyframes out-home-visual {
   0%, 50% {
@@ -895,23 +663,6 @@ html.is-arriving
   }
 }
 
-
-/* =========================================================
-   NODAL HUB OUT VISUAL
-   solid -> blur/translucent
-   ========================================================= */
-
-html.is-arriving
-.out-panel[data-transition-theme="nodal-hub"].leaving {
-
-  animation:
-    out-hub-visual
-    1.4s
-    linear
-    forwards;
-}
-
-
 @keyframes out-hub-visual {
   0%, 50% {
     background-color: rgba(235, 246, 250, 1);
@@ -925,4 +676,3 @@ html.is-arriving
     -webkit-backdrop-filter: blur(20px);
   }
 }
-

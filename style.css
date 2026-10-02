@@ -185,12 +185,21 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
   top: 50%;
   left: 50%;
   width: 110%;
-  height: 120%;
+  height: 110%;
   object-fit: cover;
   object-position: 50% 0%; /* shift focus down toward the lower part of the image */
   transform: translate(-50%, -50%);
   will-change: transform;
   transition: transform 0.15s ease-out;
+}
+
+
+/* Shift the home artwork slightly left on mobile or portrait screens.
+   Increase 55% to move it farther left; 50% restores the centered crop. */
+@media (max-width: 768px), (orientation: portrait) {
+  .hero .parallax-wrap img {
+    object-position: 55% 0%;
+  }
 }
 
 .hero-title {

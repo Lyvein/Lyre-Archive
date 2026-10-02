@@ -244,7 +244,7 @@ document.querySelectorAll('nav a').forEach((link) => {
 // HOME PAGE PARALLAX
 // =========================================================
 
-const MAX_SHIFT = 4;
+const MAX_SHIFT = 2;
 
 if (img) {
   document.addEventListener('mousemove', (e) => {

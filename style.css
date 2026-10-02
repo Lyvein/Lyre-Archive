@@ -292,7 +292,7 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
 	position: absolute;
 	inset: 0;
 
-	background-image: url("images/blue_horizontal.png");
+	background-image: url("images/1blue_horizontal.png");
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;

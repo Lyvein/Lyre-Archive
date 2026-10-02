@@ -2,10 +2,6 @@ const img = document.querySelector('.parallax-wrap img');
 
 // =========================================================
 // PAGE TRANSITION
-//
-// IN: current-page theme, blur/translucent → solid
-// LOADING: same theme
-// OUT: same theme, solid → blur/translucent
 // =========================================================
 
 const panel = document.getElementById('transition-panel');
@@ -39,33 +35,109 @@ if (loader && arrivingFromTransition) {
   const departingTheme =
     sessionStorage.getItem('departingTheme') || 'home';
 
-  // Loading and OUT both retain the departing page's colour.
   loader.dataset.transitionTheme = departingTheme;
   loader.classList.add('active');
 
   if (outPanel) {
     setPanelTheme(outPanel, departingTheme);
     outPanel.classList.remove('leaving');
+
+    const solidColor = departingTheme === 'nodal-hub'
+      ? 'rgba(235, 246, 250, 1)'
+      : 'rgba(0, 0, 0, 1)';
+
+    const translucentColor = departingTheme === 'nodal-hub'
+      ? 'rgba(235, 246, 250, 0.58)'
+      : 'rgba(0, 0, 0, 0.52)';
+
+    // The CSS contains overlapping OUT rules. Explicitly prepare
+    // this panel in a solid, unblurred state.
+    outPanel.style.animation = 'none';
+    outPanel.style.transition = 'none';
+    outPanel.style.backgroundColor = solidColor;
+    outPanel.style.backdropFilter = 'blur(0px)';
+    outPanel.style.webkitBackdropFilter = 'blur(0px)';
     forceReflow(outPanel);
 
+    // Measure the panel's starting and ending positions while
+    // loading still completely covers the screen.
+    const startLeft = outPanel.getBoundingClientRect().left;
+
+    outPanel.classList.add('leaving');
+    const endLeft = outPanel.getBoundingClientRect().left;
+
+    outPanel.classList.remove('leaving');
+    forceReflow(outPanel);
+
+    // Movement takes 1.4 seconds. Once blur begins, its visual
+    // change takes 0.65 seconds.
+    outPanel.style.transition =
+      'transform 1.4s cubic-bezier(0.83, 0, 0.17, 1), ' +
+      'background-color 1s ease, ' +
+      'backdrop-filter 1s ease, ' +
+      '-webkit-backdrop-filter 1s ease';
+
+    // Paint the solid OUT panel beneath the opaque loading screen.
     requestAnimationFrame(() => {
+      // The panel is now in place. Remove only the loader background.
+      // Its GIF remains visible over the solid OUT panel.
+      loader.style.backgroundColor = 'transparent';
+
       requestAnimationFrame(() => {
-        // The solid OUT panel covers the loader. Hide the loader
-        // before the panel starts moving so it cannot mask the animation.
-        loader.style.transition = 'none';
-        loader.style.opacity = '0';
-        loader.style.visibility = 'hidden';
-        loader.classList.remove('active', 'wipe-out');
-        forceReflow(loader);
+        // The transparent loader has now been painted. Start moving
+        // the solid OUT panel and fade the loading GIF.
+        const loadingImage = loader.querySelector('.loader-gif');
+
+        if (loadingImage) {
+          loadingImage.style.transition = 'opacity 0.2s ease';
+          loadingImage.style.opacity = '0';
+        }
 
         outPanel.classList.add('leaving');
 
+        // Watch actual movement rather than guessing from elapsed time.
+        let blurStarted = false;
+
+        function watchPanelPosition() {
+          if (blurStarted) return;
+
+          const currentLeft =
+            outPanel.getBoundingClientRect().left;
+
+          const distance = endLeft - startLeft;
+
+          const progress = distance === 0
+            ? 1
+            : (currentLeft - startLeft) / distance;
+
+          if (progress >= 0.15) {
+            blurStarted = true;
+
+            outPanel.style.backgroundColor = translucentColor;
+            outPanel.style.backdropFilter = 'blur(20px)';
+            outPanel.style.webkitBackdropFilter = 'blur(20px)';
+          } else {
+            requestAnimationFrame(watchPanelPosition);
+          }
+        }
+
+        requestAnimationFrame(watchPanelPosition);
+
         setTimeout(() => {
+          loader.style.transition = 'none';
+          loader.style.opacity = '0';
+          loader.style.visibility = 'hidden';
+
+          loader.classList.remove('active', 'wipe-out');
           loader.removeAttribute('data-transition-theme');
 
           document.documentElement.classList.remove('is-arriving');
-          document.documentElement.removeAttribute('data-departing-theme');
-          document.documentElement.removeAttribute('data-target-theme');
+          document.documentElement.removeAttribute(
+            'data-departing-theme'
+          );
+          document.documentElement.removeAttribute(
+            'data-target-theme'
+          );
 
           sessionStorage.removeItem('siteTransitioning');
           sessionStorage.removeItem('departingTheme');
@@ -77,6 +149,12 @@ if (loader && arrivingFromTransition) {
             loader.style.transition = '';
             loader.style.opacity = '';
             loader.style.visibility = '';
+            loader.style.backgroundColor = '';
+
+            if (loadingImage) {
+              loadingImage.style.transition = '';
+              loadingImage.style.opacity = '';
+            }
           });
         }, TRANSITION_DURATION);
       });
@@ -138,7 +216,6 @@ document.querySelectorAll('nav a').forEach((link) => {
       return;
     }
 
-    // Transition IN uses the page being left.
     setPanelTheme(panel, currentPageTheme);
     panel.classList.remove('covering');
     forceReflow(panel);
@@ -167,7 +244,7 @@ document.querySelectorAll('nav a').forEach((link) => {
 // HOME PAGE PARALLAX
 // =========================================================
 
-const MAX_SHIFT = 4;
+const MAX_SHIFT = 2;
 
 if (img) {
   document.addEventListener('mousemove', (e) => {

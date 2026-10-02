@@ -275,7 +275,7 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
 
 	/* Change this one value to recolor the Lyvein nodes + labels. */
 	--node-color: #C7EDF7;
-	--node-label-color: #8FD5ED;
+	--node-label-color: #87E4FA;
 }
 
 
@@ -344,9 +344,9 @@ nav a:hover { opacity: 1; color: var(--menu_accent); }
 	font-size: clamp(16px, 0.78vw, 25px);
 	font-weight: 600;
 	letter-spacing: 0.08em;
-	color: var(--node-color);
+	color: var(--node-label-color);
 	text-shadow:
-		0 0 8px color-mix(in srgb, var(--node-color) 40%, transparent);
+		0 0 8px color-mix(in srgb, var(--node-label-color) 40%, transparent);
 	transition:
 		color 0.35s ease,
 		opacity 0.35s ease;

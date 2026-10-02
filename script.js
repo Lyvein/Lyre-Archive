@@ -531,8 +531,7 @@ initSparks('sparks');
       const degrees = points.map(() => 0);
       const linked = new Set();
 
-      const edgeKey = (a, b) =>
-        `${Math.min(a, b)}:${Math.max(a, b)}`;
+      const edgeKey = (a, b) => Math.min(a, b) + ':' + Math.max(a, b);
 
       const length = (a, b) => Math.hypot(
         points[a].x - points[b].x,
